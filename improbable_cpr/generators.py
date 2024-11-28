@@ -4,7 +4,7 @@ from enum import Enum, auto
 import abc
 from operator import mul
 import random
-from typing import Any, Generator
+from typing import Any, Generator, Iterator
 
 from improbable_cpr.cpr import Cpr
 
@@ -150,7 +150,7 @@ class CprGenerator:
     def invalidControlDigit(cls, cpr: Cpr) -> bool:
         return not cls.validateControlDigit(cpr)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Cpr]:
         return filter(self.invalidControlDigit, YearGenerator(self.options))
 
 class GenerationException(Exception):
