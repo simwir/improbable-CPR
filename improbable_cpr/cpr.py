@@ -37,3 +37,6 @@ class Cpr():
 
     def __str__(self) -> str:
         return self.get_dash()
+
+    def __repr__(self) -> str:
+        return f"Cpr({self.year}, {self.month}, {self.day}, {self.running_number})"

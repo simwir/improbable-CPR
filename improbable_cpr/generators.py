@@ -1,5 +1,6 @@
 import calendar
 from dataclasses import dataclass, field
+from datetime import date
 from enum import Enum, auto
 import abc
 from operator import mul
@@ -18,6 +19,8 @@ class Options:
     months: list[int] = field(default_factory=lambda: list(range(1,13)))
     days: list[int] | None = None
     genders: list[Gender] = field(default_factory= lambda: [Gender.FEMALE, Gender.MALE])
+    min_date: date | None = None
+    max_date: date | None = None
 
 
 class RunningNumberGenerator:
@@ -108,7 +111,7 @@ class DayGenerator(AbstractGenerator):
 
 class MonthGenerator(AbstractGenerator):
     def __init__(self, year: int, options: Options) -> None:
-        super().__init__(options.months)
+        super().__init__(self.get_months(year, options))
         self.year = year
         self.options = options
 
@@ -116,9 +119,26 @@ class MonthGenerator(AbstractGenerator):
         cpr.month = choise
         return cpr
 
+    def is_limit_month(self, month: int, limit: date) -> bool:
+        return self.year == limit.year and month == limit.month
+
+    def get_months(self, year, options: Options) -> list[int]:
+        min_filter = lambda x: True
+        max_filter = lambda x: True
+        if options.min_date is not None and options.min_date.year == year:
+            min_filter = lambda month: month >= options.min_date.month # type: ignore
+        if options.max_date is not None and options.max_date.year == year:
+            max_filter = lambda month: month <= options.max_date.month # type: ignore
+
+        return [month for month in options.months if min_filter(month) and max_filter(month)]
+
+    def get_days(self, month: int) -> list[int]:
+        min_day = self.options.min_date.day if self.options.min_date is not None and self.is_limit_month(month, self.options.min_date) else 1
+        max_day = self.options.max_date.day if self.options.max_date is not None and self.is_limit_month(month, self.options.max_date) else calendar.monthrange(self.year, month)[1]
+        return list(range(min_day, max_day + 1))
+
     def getGenerator(self, choise: int) -> Generator[Cpr, Any, None]:
-        num_days = calendar.monthrange(self.year, choise)[1]
-        days = list(range(1, num_days + 1))
+        days = self.get_days(choise)
         if self.options.days is not None:
             days = list(set(days) & set(self.options.days))
 
