@@ -1,4 +1,4 @@
-from improbable_cpr.generators import MonthGenerator, Gender
+from improbable_cpr.generators import MonthGenerator, Gender, Options
 import pytest
 
 @pytest.mark.parametrize(
@@ -7,7 +7,7 @@ import pytest
 )
 def test_entire_single_month(month, num_days, seed_random):
     days: dict[int, bool] = {i: False for i in range(1, num_days + 1)}
-    for cpr in MonthGenerator([month], 1995, [Gender.FEMALE], None):
+    for cpr in MonthGenerator(1995, Options(months=[month], genders=[Gender.FEMALE])):
         assert cpr.month == month
         assert cpr.day in days
         days[cpr.day] = True
@@ -19,7 +19,7 @@ def test_entire_single_month(month, num_days, seed_random):
 
 def test_date_interval(seed_random):
     days: dict[int, bool] = {i: False for i in range(20, 31)}
-    for cpr in MonthGenerator([6], 1998, [Gender.MALE], list(range(20, 32))):
+    for cpr in MonthGenerator(1998, Options(months=[6], genders=[Gender.MALE], days=list(range(20, 32)))):
         assert cpr.month == 6
         assert cpr.day in days
         days[cpr.day] = True
@@ -30,7 +30,7 @@ def test_date_interval(seed_random):
 def test_multiple_months(seed_random):
     month1 = False
     month2 = False
-    for cpr in MonthGenerator([4,9], 2006, [Gender.FEMALE], None):
+    for cpr in MonthGenerator(2006, Options(months=[4,9], genders=[Gender.FEMALE])):
         if cpr.month == 4:
             month1 = True
         elif cpr.month == 9:

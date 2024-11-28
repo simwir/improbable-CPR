@@ -1,16 +1,16 @@
-from improbable_cpr.generators import YearGenerator, Gender
+from improbable_cpr.generators import Options, YearGenerator, Gender
 import itertools
 import pytest
 
 @pytest.mark.parametrize("year", [(1900), (2000)])
 def test_single_year(year: int, seed_random):
-    for cpr in itertools.islice(YearGenerator(years=[year]), 100):
+    for cpr in itertools.islice(YearGenerator(Options(years=[year])), 100):
         assert cpr.year == year
 
 def test_multiple_years(seed_random):
     year1 = False
     year2 = False
-    for cpr in YearGenerator(years=[2038, 1899]):
+    for cpr in YearGenerator(Options(years=[2038, 1899])):
         if cpr.year == 2038:
             year1 = True
         elif cpr.year == 1899:
@@ -25,7 +25,7 @@ def test_multiple_years(seed_random):
 
 def test_all_months(seed_random):
     months = {i: False for i in range(1, 13)}
-    for cpr in YearGenerator([2020], [Gender.FEMALE], days=[25]):
+    for cpr in YearGenerator(Options(years=[2020], genders=[Gender.FEMALE], days=[25])):
         assert cpr.year == 2020
         assert cpr.month in months
         months[cpr.month] = True
@@ -38,7 +38,7 @@ def test_all_months(seed_random):
 def test_some_months():
     month1 = False
     month2 = False
-    for cpr in YearGenerator([1966], [Gender.MALE], days=[12], months=[5, 9]):
+    for cpr in YearGenerator(Options(years=[1966], genders=[Gender.MALE], days=[12], months=[5, 9])):
         assert cpr.year == 1966
         if cpr.month == 5:
             month1 = True

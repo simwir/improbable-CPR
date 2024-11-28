@@ -1,5 +1,5 @@
 import calendar
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 import abc
 from operator import mul
@@ -14,10 +14,10 @@ class Gender(Enum):
 
 @dataclass
 class Options:
-    years: list[int] | None = None
-    months: list[int] | None = None
+    years: list[int] = field(default_factory=lambda:  list(range(1858, 2058)))
+    months: list[int] = field(default_factory=lambda: list(range(1,13)))
     days: list[int] | None = None
-    genders: list[Gender] | None = None
+    genders: list[Gender] = field(default_factory= lambda: [Gender.FEMALE, Gender.MALE])
 
 
 class RunningNumberGenerator:
@@ -94,24 +94,23 @@ class GenderGenerator(AbstractGenerator):
         return cpr
 
 class DayGenerator(AbstractGenerator):
-    def __init__(self, days: list[int], year: int, genders: list[Gender]) -> None:
+    def __init__(self, days: list[int], year: int, options: Options) -> None:
         super().__init__(days)
         self.year = year
-        self.genders = genders
+        self.options = options
 
     def getGenerator(self, choise: Any) -> Generator[Cpr, Any, None]:
-        return iter(GenderGenerator(self.year, self.genders))
+        return iter(GenderGenerator(self.year, self.options.genders))
     
     def enrich(self, cpr: Cpr, choise: int) -> Cpr:
         cpr.day = choise
         return cpr
 
 class MonthGenerator(AbstractGenerator):
-    def __init__(self, months: list[int], year: int, genders: list[Gender], days: list[int] | None) -> None:
-        super().__init__(months)
+    def __init__(self, year: int, options: Options) -> None:
+        super().__init__(options.months)
         self.year = year
-        self.genders = genders
-        self.days = days
+        self.options = options
 
     def enrich(self, cpr: Cpr, choise: int) -> Cpr:
         cpr.month = choise
@@ -120,39 +119,28 @@ class MonthGenerator(AbstractGenerator):
     def getGenerator(self, choise: int) -> Generator[Cpr, Any, None]:
         num_days = calendar.monthrange(self.year, choise)[1]
         days = list(range(1, num_days + 1))
-        if self.days is not None:
-            days = list(set(days) & set(self.days))
+        if self.options.days is not None:
+            days = list(set(days) & set(self.options.days))
 
-        return iter(DayGenerator(days, self.year, self.genders))
+        return iter(DayGenerator(days, self.year, self.options))
 
 class YearGenerator(AbstractGenerator):
-    def __init__(self, years: list[int] | None = None, genders: list[Gender] | None = None, days: list[int] | None = None, months: list[int] | None = None) -> None:
-        if years is None:
-            years = list(range(1858, 2058))
-        super().__init__(years)
-        if genders is None:
-            genders = [Gender.FEMALE, Gender.MALE]
-        self.genders = genders
-        self.days = days
-        if months is None:
-            months = list(range(1,13))
-        self.months = months
+    def __init__(self, options: Options) -> None:
+        self.options = options
+        super().__init__(self.options.years)
 
     def enrich(self, cpr: Cpr, choise: int) -> Cpr:
         cpr.year = choise
         return cpr
 
     def getGenerator(self, choise: int) -> Generator[Cpr, Any, None]:
-        return iter(MonthGenerator(self.months, choise, self.genders, self.days))
+        return iter(MonthGenerator(choise, self.options))
 
 class CprGenerator:
     MULTIPLICATION_TABLE = [4, 3, 2, 7, 6, 5, 4, 3, 2, 1]
 
-    def __init__(self, years: list[int] | None = None, genders: list[Gender] | None = None, days: list[int] | None = None, months: list[int] | None = None) -> None:
-        self.years = years
-        self.genders = genders
-        self.days = days
-        self.months = months
+    def __init__(self, options: Options) -> None:
+        self.options = options
 
     @classmethod
     def validateControlDigit(cls, cpr: Cpr) -> bool:
@@ -163,7 +151,7 @@ class CprGenerator:
         return not cls.validateControlDigit(cpr)
 
     def __iter__(self):
-        return filter(self.invalidControlDigit, YearGenerator(self.years, self.genders, self.days, self.months))
+        return filter(self.invalidControlDigit, YearGenerator(self.options))
 
 class GenerationException(Exception):
     pass

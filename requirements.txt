@@ -1,2 +1,1 @@
 # Runtime requirements
-numpy>=1.21.6
