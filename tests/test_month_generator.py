@@ -50,7 +50,6 @@ def test_no_days_before_min_date(seed_random):
         has_results = True
         assert cpr.day == 2
     assert has_results
-    # test that no days less than the min date is chosen for the min month, but other months are unaffected. (maybe seperate tests)
 
 def test_min_days_only_affect_correct_month(seed_random):
     has_results = False

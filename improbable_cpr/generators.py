@@ -147,7 +147,17 @@ class MonthGenerator(AbstractGenerator):
 class YearGenerator(AbstractGenerator):
     def __init__(self, options: Options) -> None:
         self.options = options
-        super().__init__(self.options.years)
+        super().__init__(self.get_years(options))
+
+    def get_years(self, options: Options) -> list[int]:
+        min_filter = lambda x: True
+        max_filter = lambda x: True
+        if options.min_date is not None:
+            min_filter = lambda year: year >= options.min_date.year # type: ignore
+        if options.max_date is not None:
+            max_filter = lambda year: year <= options.max_date.year # type: ignore
+
+        return [year for year in options.years if min_filter(year) and max_filter(year)]
 
     def enrich(self, cpr: Cpr, choise: int) -> Cpr:
         cpr.year = choise

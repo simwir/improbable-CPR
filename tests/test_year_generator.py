@@ -1,3 +1,4 @@
+from datetime import date
 from improbable_cpr.generators import Options, YearGenerator, Gender
 import itertools
 import pytest
@@ -52,4 +53,24 @@ def test_some_months():
     
     assert month1
     assert month2
-    
+
+def test_no_years_before_min_year(seed_random):
+    has_results = False
+    for cpr in YearGenerator(Options(years=[1988, 1989], months=[12], days=[6], min_date=date(1989, 5, 5))):
+        has_results = True
+        assert cpr.year == 1989
+    assert has_results
+
+def test_no_years_after_max_year(seed_random):
+    has_results = False
+    for cpr in YearGenerator(Options(years=[1988, 1989], months=[3], days=[6], max_date=date(1988, 5, 5))):
+        has_results = True
+        assert cpr.year == 1988
+    assert has_results
+
+def test_years_only_between_min_and_max_year(seed_random):
+    has_results = False
+    for cpr in YearGenerator(Options(years=[2004, 2005, 2006], months=[8], days=[5], min_date=date(2005, 1, 1), max_date=date(2005, 12, 31))):
+        has_results = True
+        assert cpr.year == 2005
+    assert has_results
