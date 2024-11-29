@@ -1,9 +1,12 @@
+from datetime import date
 from typing import Iterator, Self
 from improbable_cpr.cpr import Cpr
 from improbable_cpr.generators import CprGenerator, Gender, Options
 
-class CprBuilder:
 
+today_func = date.today
+
+class CprBuilder:
     def __init__(self):
         self.options = Options()
         self.iterator: Iterator[Cpr] | None = None
@@ -41,6 +44,34 @@ class CprBuilder:
 
     def with_month(self, month: int) -> Self:
         return self.with_months([month])
+
+    def with_min_date(self, min_date: date) -> Self:
+        self.options.min_date = min_date
+        return self
+
+    def with_max_date(self, max_date: date) -> Self:
+        self.options.max_date = max_date
+        return self
+
+    def with_age(self, age: int) -> Self:
+        today = today_func()
+        birth_year = today.year - age
+        self.options.max_date = date(birth_year, today.month, today.day)
+        try:
+            self.options.min_date = date(birth_year - 1, today.month, today.day + 1)
+        except ValueError as e:
+            if e.args[0] == 'day is out of range for month':
+                try:
+                    self.options.min_date = date(birth_year - 1, today.month + 1, 1)
+                except ValueError as e:
+                    if e.args[0] == 'month must be in 1..12':
+                        self.options.min_date = date(birth_year, 1, 1)
+                    else:
+                        raise e
+            else:
+                raise e
+        return self
+
 
     def __iter__(self) -> Iterator[Cpr]:
         return iter(CprGenerator(self.options))
