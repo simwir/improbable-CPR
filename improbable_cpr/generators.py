@@ -1,7 +1,7 @@
 import calendar
 from dataclasses import dataclass, field
 from datetime import date
-from enum import Enum, auto
+from enum import StrEnum, auto
 import abc
 from operator import mul
 import random
@@ -9,9 +9,12 @@ from typing import Any, Generator, Iterator
 
 from improbable_cpr.cpr import Cpr
 
-class Gender(Enum):
+class Gender(StrEnum):
     FEMALE=auto()
     MALE=auto()
+
+    def __str__(self):
+        return self.value
 
 @dataclass
 class Options:

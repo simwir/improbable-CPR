@@ -10,9 +10,15 @@ class CprBuilder:
     def __init__(self):
         self.options = Options()
         self.iterator: Iterator[Cpr] | None = None
+        self.custom_year = False
+        self.custom_month = False
+        self.custom_day = False
 
     def with_years(self, years: list[int]) -> Self:
-        self.options.years = years
+        if not self.custom_year:
+            self.options.years = []
+            self.custom_year = True
+        self.options.years.extend(years)
         return self
 
     def with_year_range(self, start_year: int, end_year) -> Self:
@@ -26,7 +32,10 @@ class CprBuilder:
         return self
 
     def with_days(self, days: list[int]) -> Self:
-        self.options.days = days
+        if not self.custom_day or self.options.days is None:
+            self.options.days = []
+            self.custom_day = True
+        self.options.days.extend(days)
         return self
 
     def with_day_range(self, start_day: int, end_day: int) -> Self:
@@ -36,7 +45,10 @@ class CprBuilder:
         return self.with_days([day])
 
     def with_months(self, months: list[int]) -> Self:
-        self.options.months = months
+        if not self.custom_month:
+            self.options.months = []
+            self.custom_month = True
+        self.options.months.extend(months)
         return self
 
     def with_month_range(self, start_month: int, end_month: int) -> Self:
