@@ -1,6 +1,7 @@
 from typing import Self
 
-class Cpr():
+
+class Cpr:
 
     def __init__(self) -> None:
         self.running_number: int | None = None
@@ -22,7 +23,7 @@ class Cpr():
         if digit_7 >= 0 and digit_7 <= 3:
             return 1900 + two_digit_year
         elif digit_7 == 4 or digit_7 == 9:
-            if (two_digit_year >= 37 and two_digit_year <= 99):
+            if two_digit_year >= 37 and two_digit_year <= 99:
                 return 1900 + two_digit_year
             else:
                 return 2000 + two_digit_year
@@ -44,7 +45,7 @@ class Cpr():
 
     def get_running_number(self) -> str:
         return f"{self.running_number:04d}"
-    
+
     def get_no_dash(self) -> str:
         return self.get_date() + self.get_running_number()
 
@@ -55,7 +56,10 @@ class Cpr():
         return self.get_dash()
 
     def __repr__(self) -> str:
-        return f"Cpr({self.day}, {self.month}, {self.year}, {self.running_number})"
-    
+        return (
+            f"Cpr({self.day}, {self.month}, {self.year}, {self.running_number})"
+        )
+
+
 class CprException(Exception):
     pass

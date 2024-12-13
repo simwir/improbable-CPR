@@ -1,5 +1,5 @@
 def series(last_digit: int, increment: int) -> int:
-    count = 1 # The first number.
+    count = 1  # The first number.
 
     next_num = last_digit + increment
     while next_num < 10000:
@@ -7,6 +7,7 @@ def series(last_digit: int, increment: int) -> int:
         next_num += increment
 
     return count
+
 
 print(f"F1: {series(4,6)}")
 print(f"F2: {series(2,6)}")

@@ -1,5 +1,6 @@
 from improbable_cpr.cpr import Cpr
 
+
 def test_cpr_constructor():
     cpr = Cpr.from_str("1005746804")
     assert cpr.day == 10

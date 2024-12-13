@@ -1,4 +1,6 @@
-from improbable_cpr.generators import GenderGenerator, Gender
+from improbable_cpr.generators import Gender
+from improbable_cpr.generators import GenderGenerator
+
 
 def test_female(seed_random):
     for cpr in GenderGenerator(1950, [Gender.FEMALE]):
@@ -6,11 +8,13 @@ def test_female(seed_random):
         assert running_number is not None
         assert running_number % 2 == 0
 
+
 def test_male(seed_random):
     for cpr in GenderGenerator(1890, [Gender.MALE]):
         running_number = cpr.running_number
         assert running_number is not None
         assert running_number % 2 != 0
+
 
 def test_both_gender(seed_random):
     female = False
