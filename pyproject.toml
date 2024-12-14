@@ -28,6 +28,9 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.scripts]
+improbable_cpr = "improbable_cpr:main_cli"
+
 [project.optional-dependencies]
 test = [
     "pytest",
