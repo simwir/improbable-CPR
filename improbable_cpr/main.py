@@ -11,8 +11,7 @@ from improbable_cpr.generators import Gender
 
 number_list_regex = r"(\d+)(,|$)|(\d+)-(\d+)"
 
-
-def main_cli() -> CprBuilder:
+def main_cli() -> None:
     argument_parser = argparse.ArgumentParser(
         description="Generate CPR numbers suitible for testing. A CPR number is the national identity number of Denmark. This program generates CPR numbers that are suitible for testing, as they do not satisfy the modulo 11 test. These numbers are only allocated as a last resort.",
     )
@@ -97,8 +96,6 @@ def main_cli() -> CprBuilder:
             print(cpr.get_dash())
         else:
             print(cpr.get_no_dash())
-
-    return builder
 
 
 def list_parser(
